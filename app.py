@@ -5,15 +5,18 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import requests
-from transformers import pipeline
+from textblob import TextBlob
 
 load_dotenv()
 
 app = Flask(__name__)
 
-print("Loading AI model...")
-sentiment_model = pipeline("sentiment-analysis")
-print("Model ready!")
+def analyse_sentiment(text):
+    analysis = TextBlob(text)
+    if analysis.sentiment.polarity > 0:
+        return "POSITIVE", round(abs(analysis.sentiment.polarity) * 100, 2)
+    else:
+        return "NEGATIVE", round(abs(analysis.sentiment.polarity) * 100, 2)
 
 def fetch_and_analyse(topic):
     API_KEY = os.getenv("NEWS_API_KEY")
@@ -36,9 +39,7 @@ def fetch_and_analyse(topic):
         source = article["source"]["name"]
         published = article["publishedAt"][:10]
 
-        result = sentiment_model(title[:512])[0]
-        label = result["label"]
-        score = round(result["score"] * 100, 2)
+        label, score = analyse_sentiment(title)
 
         results.append({
             "title": title,
@@ -53,9 +54,6 @@ def fetch_and_analyse(topic):
 @app.route("/", methods=["GET", "POST"])
 def index():
     topic = "technology"
-    df = None
-    pie_html = None
-    bar_html = None
 
     if request.method == "POST":
         topic = request.form.get("topic", "technology")
@@ -75,7 +73,7 @@ def index():
     )
     pie_html = pio.to_html(pie, full_html=False)
 
-    # Bar chart
+ # Bar chart
     source_sentiment = df.groupby(["source", "sentiment"]).size().reset_index(name="count")
     bar = px.bar(
         source_sentiment,
@@ -99,3 +97,4 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
