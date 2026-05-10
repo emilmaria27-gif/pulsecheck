@@ -2,7 +2,7 @@
 
 A live web application that fetches real news headlines, classifies them as positive or negative using a pre-trained AI model, and displays sentiment trends on an interactive dashboard.
 
-**Live demo:** [your-link-here] ← we'll add this after deployment
+ **Live demo:** [https://pulsecheck-3h3o.onrender.com](https://pulsecheck-3h3o.onrender.com)
 
 ---
 
