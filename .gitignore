@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.env
+pie_chart.html
+bar_chart.html
+.DS_Store
